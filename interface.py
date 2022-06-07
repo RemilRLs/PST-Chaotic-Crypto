@@ -30,6 +30,7 @@ def callbackLorenz(menu):
 
 def encrypt_file(filename, yesorno, encryptFile):
 
+    global imageHenon
 
     if(yesorno):
 
@@ -82,8 +83,8 @@ def encrypt_file(filename, yesorno, encryptFile):
             height = imgToEncrypt.shape[0]
             width = imgToEncrypt.shape[1] # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
 
-            hn.pixelManipulation(width, imgToEncrypt)
-    
+            imageHenon = hn.pixelManipulation(width, imgToEncrypt)
+ 
     else:
         if(chooseUser == 'Logistic Map'):
             plt.imshow(encryptFile)
@@ -112,31 +113,14 @@ def encrypt_file(filename, yesorno, encryptFile):
             plt.imsave('image/decrypt.bmp', decryptedImg)
 
         if(chooseUser == 'Henon Map'):
-
-            plt.imshow(encryptFile)
+            plt.imshow(imageHenon)
             plt.show()
 
-            height = encryptFile.shape[0]
-            width = encryptFile.shape[1] # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
-
+            height = imageHenon.shape[0]
+            width = imageHenon.shape[1] # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
             print(height, width)
 
-        #key = hn.Henonmap(0.001, 0.2, 1.4, 0.3, height*width) # Génératation de la clé à l'aide de la map chaotique Henon.
-            
-            a = 0
-       
-            decryptedImg = np.zeros(shape=[height, width,4], dtype = np.uint8)
-
-            for i in range(height):
-                for j in range(width):
-
-                    # On refait un XOR par dessus afin de revenir en arrière.
-                    decryptedImg[i, j] = encryptFile[i, j] ^ key[a]
-                    a += 1
-
-            plt.imshow(decryptedImg)
-            plt.show()
-            plt.imsave('image/decrypt.bmp', decryptedImg)
+            hn.decryptHenonImage(imageHenon)
 
 
 

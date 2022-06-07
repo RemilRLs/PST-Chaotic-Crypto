@@ -3,6 +3,8 @@ from PIL import Image
 import os
 import numpy
 import math
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 from PIL import Image
 
@@ -13,10 +15,10 @@ def imageMatrix(imgToEncrypt):
 
   image_matrix = []
 
-  for w in range(width):
+  for w in range(height):
     row = []
 
-    for h in range(height):
+    for h in range(width):
 
       try:
         row.append(imgToEncrypt[w,h])
@@ -80,20 +82,20 @@ def generateHenonMap(size):
       except:
         byteArray = [decimal]
 
-      print(bitSequence, decimal)
+      #print(bitSequence, decimal)
 
       bitSequence = []
 
       byteArraySize = size * 8
 
       if(i % byteArraySize == byteArraySize - 1):
-        print(byteArray)
+        #print(byteArray)
         
         try:
           TImageMatrix.append(byteArray)
         except:
           TImageMatrix = [byteArray]
-        print(len(byteArray), byteArray)
+        #print(len(byteArray), byteArray)
 
         byteArray = []
 
@@ -103,9 +105,9 @@ def generateHenonMap(size):
 
 def pixelManipulation(size, imageName):
     imageMatrixs = imageMatrix(imageName)
-    print("ImageMatrix Rows : %d Cols : %d " % (len(imageMatrixs), len(imageMatrixs[0])))
+    #print("ImageMatrix Rows : %d Cols : %d " % (len(imageMatrixs), len(imageMatrixs[0])))
     transformationMatrix = generateHenonMap(size)
-    print("Transformation Matrix Rows : %d Cols : %d" %(len(transformationMatrix),len(transformationMatrix[0])))
+    #print("Transformation Matrix Rows : %d Cols : %d" %(len(transformationMatrix),len(transformationMatrix[0])))
 
     resultantMatrix = []
     for i in range(size):
@@ -120,9 +122,9 @@ def pixelManipulation(size, imageName):
         except:
             resultantMatrix = [row]
 
-    print("Pixel Manipulated Values : ")
-    for rows in resultantMatrix:
-         print(rows)
+    #print("Pixel Manipulated Values : ")
+#    for rows in resultantMatrix:
+         #print(rows)
 
     im = Image.new("L", (size, size))
     pix = im.load()
@@ -130,5 +132,70 @@ def pixelManipulation(size, imageName):
         for y in range(size):
             pix[x, y] = int(resultantMatrix[x][y])
     im.save("HenonTransformedImage.bmp", "BMP")
-    absPath = os.path.abspath("image/HenonTransformedImage.bmp")
-    return absPath
+
+    imgToEncrypt = mpimg.imread("HenonTransformedImage.bmp")
+    plt.imshow(imgToEncrypt)
+    plt.show()
+
+    return imgToEncrypt
+
+
+
+def decryptHenonImage(imageName):
+    imageMatrixs = imageMatrix(imageName)
+    transformationMatrix =imageMatrixTransformation(len(imageMatrixs))
+
+    henonDecryptedImage = []
+    for i in range(len(imageMatrixs)):
+        row = []
+        for j in range(len(imageMatrixs)):
+            try:
+                row.append(imageMatrixs[i][j] ^ transformationMatrix[i][j])
+            except:
+                row = [imageMatrixs[i][j] ^ transformationMatrix[i][j]]
+
+        try:
+            henonDecryptedImage.append(row)
+        except:
+            henonDecryptedImage = [row]
+
+    width  = len(imageMatrixs[0])
+    height = len(imageMatrixs)
+
+    im = Image.new("L", (width, height))
+    pix = im.load()
+    for x in range(width):
+        for y in range(height):
+            pix[x, y] = henonDecryptedImage[x][y]
+    im.save("HenonDecryptedImage.bmp", "BMP")
+
+    return os.path.abspath("HenonDecryptedImage.bmp")
+
+
+def imageMatrixTransformation(imgToEncrypt):
+  
+  im = Image.open(imgToEncrypt)
+  pix = im.load()
+
+  image_size = im.size 
+
+
+
+  image_matrix = []
+
+  for w in range(int(image_size[0])):
+    row = []
+
+    for h in range(int(image_size[1])):
+
+      try:
+        row.append(imgToEncrypt[w,h])
+      except:
+        row = imgToEncrypt[w,h]
+    try: 
+      image_matrix.append(row)
+    except:
+      image_matrix = [row]
+  
+
+  return image_matrix
