@@ -122,10 +122,6 @@ def pixelManipulation(size, imageName):
         except:
             resultantMatrix = [row]
 
-    #print("Pixel Manipulated Values : ")
-#    for rows in resultantMatrix:
-         #print(rows)
-
     im = Image.new("L", (size, size))
     pix = im.load()
     for x in range(size):
@@ -143,7 +139,7 @@ def pixelManipulation(size, imageName):
 
 def decryptHenonImage(imageName):
     imageMatrixs = imageMatrix(imageName)
-    transformationMatrix =imageMatrixTransformation(len(imageMatrixs))
+    transformationMatrix = generateHenonMap(len(imageMatrixs))
 
     henonDecryptedImage = []
     for i in range(len(imageMatrixs)):
@@ -166,11 +162,10 @@ def decryptHenonImage(imageName):
     pix = im.load()
     for x in range(width):
         for y in range(height):
-            pix[x, y] = henonDecryptedImage[x][y]
+            pix[x, y] = int(henonDecryptedImage[x][y])
     im.save("HenonDecryptedImage.bmp", "BMP")
-
+    #return henonDecryptedImage
     return os.path.abspath("HenonDecryptedImage.bmp")
-
 
 def imageMatrixTransformation(imgToEncrypt):
   

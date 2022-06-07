@@ -8,6 +8,8 @@ import Henon as hn
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
+import Lorenz as lz
+import stats as st
 from tkinter import Menu
 
 from PIL import ImageTk, Image
@@ -84,7 +86,44 @@ def encrypt_file(filename, yesorno, encryptFile):
             width = imgToEncrypt.shape[1] # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
 
             imageHenon = hn.pixelManipulation(width, imgToEncrypt)
- 
+
+        if(chooseUser == 'Lorenz Map'):
+            imgToEncrypt = mpimg.imread(filename)
+            plt.imshow(imgToEncrypt) # Génération de l'image à l'aide d'une structure.
+            plt.show() # Permet d'afficher celle-ci.
+
+
+            height = imgToEncrypt.shape[0]
+            width = imgToEncrypt.shape[1] 
+
+            encryptedImg = np.zeros(shape=[height, width,4], dtype = np.uint8)
+        # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
+            xkey,ykey,zkey = lz.Lorenzkey(0.01, 0.02,0.03, height*width)
+            print(xkey,ykey,zkey)
+
+        
+        #Encryption-suntitution with XOR
+        for i in range(height):
+            l=0
+            for j in range(width):
+            #key generation
+                zk = int((zkey[l]*pow(10,12))%256)
+                yk = int((ykey[l]*pow(10,12))%256)
+                xk = int((xkey[l]*pow(10,12))%256)
+            #pixel value is XORed with key
+                encryptedImg[i,j]= imgToEncrypt[i,j] ^ zk
+                encryptedImg[i,j]= encryptedImg[i,j] ^ yk
+                encryptedImg[i,j]= encryptedImg[i,j] ^ xk
+                l=l+1
+
+        plt.imsave('image/encrypt.bmp', encryptedImg)
+        
+        encryptFile = encryptedImg
+        plt.imshow(encryptFile)
+        plt.show()
+
+        return encryptedImg
+    
     else:
         if(chooseUser == 'Logistic Map'):
             plt.imshow(encryptFile)
@@ -121,6 +160,44 @@ def encrypt_file(filename, yesorno, encryptFile):
             print(height, width)
 
             hn.decryptHenonImage(imageHenon)
+        
+        if(chooseUser == 'Lorenz Map'):
+            plt.imshow(encryptFile)
+            plt.show()
+
+            height = encryptFile.shape[0]
+            width = encryptFile.shape[1] # On récupère dans notre structure les informations t-elle que la hauteur et la largeur.
+
+            print(height, width)
+
+            xkey,ykey,zkey = lz.Lorenzkey(0.01, 0.02,0.03, height*width)
+            print(xkey,ykey,zkey)
+
+
+        
+            # Génération de la clé :
+            # 0.01 : Paramètre d'initialisation.
+            # 3.95 : Notre mu (ici la suite sera totalement chaotique (cycle très attractif)).
+            # width*height : On donne la largeur * la hauteur de l'image afin de subsituer chacun des pixels.        
+            decryptedImg = np.zeros(shape=[height, width,4], dtype = np.uint8)
+            
+            for i in range(height):
+                l=0
+                for j in range(width):
+                    #key generation
+                    zk = int((zkey[l]*pow(10,12))%256)
+                    yk = int((ykey[l]*pow(10,12))%256)
+                    xk = int((xkey[l]*pow(10,12))%256)
+                    #pixel value is XORed with key
+                    decryptedImg[i,j]= encryptFile[i,j] ^ xk
+                    decryptedImg[i,j]= decryptedImg[i,j] ^ yk
+                    decryptedImg[i,j]= decryptedImg[i,j] ^ zk
+                    l=l+1
+
+
+            plt.imshow(decryptedImg)
+            plt.show()
+            plt.imsave('image/decrypt.bmp', decryptedImg)
 
 
 
@@ -146,7 +223,7 @@ def select_fileEncrypt():
     global encryptFile 
     encryptFile = 1
     encryptFile = encrypt_file(filename, 1, encryptFile)
-
+    st.stats("image/encrypt.bmp")
 
 
 def select_fileDecrypt():
