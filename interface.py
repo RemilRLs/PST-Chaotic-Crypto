@@ -103,26 +103,26 @@ def encrypt_file(filename, yesorno, encryptFile):
 
         
         #Encryption-suntitution with XOR
-        for i in range(height):
-            l=0
-            for j in range(width):
-            #key generation
-                zk = int((zkey[l]*pow(10,12))%256)
-                yk = int((ykey[l]*pow(10,12))%256)
-                xk = int((xkey[l]*pow(10,12))%256)
-            #pixel value is XORed with key
-                encryptedImg[i,j]= imgToEncrypt[i,j] ^ zk
-                encryptedImg[i,j]= encryptedImg[i,j] ^ yk
-                encryptedImg[i,j]= encryptedImg[i,j] ^ xk
-                l=l+1
+            for i in range(height):
+                l=0
+                for j in range(width):
+                #key generation
+                    zk = int((zkey[l]*pow(10,12))%256)
+                    yk = int((ykey[l]*pow(10,12))%256)
+                    xk = int((xkey[l]*pow(10,12))%256)
+                #pixel value is XORed with key
+                    encryptedImg[i,j]= imgToEncrypt[i,j] ^ zk
+                    encryptedImg[i,j]= encryptedImg[i,j] ^ yk
+                    encryptedImg[i,j]= encryptedImg[i,j] ^ xk
+                    l=l+1
 
-        plt.imsave('image/encrypt.bmp', encryptedImg)
-        
-        encryptFile = encryptedImg
-        plt.imshow(encryptFile)
-        plt.show()
+            plt.imsave('image/encrypt.bmp', encryptedImg)
+            
+            encryptFile = encryptedImg
+            plt.imshow(encryptFile)
+            plt.show()
 
-        return encryptedImg
+            return encryptedImg
     
     else:
         if(chooseUser == 'Logistic Map'):
